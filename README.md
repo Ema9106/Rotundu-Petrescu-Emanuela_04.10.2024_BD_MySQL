@@ -1,29 +1,46 @@
-# Bază de Date pentru Clinică Stomatologică - proiect final 04.10.2024
+# Bază de Date pentru **Clinică Stomatologică - proiect final 04.10.2024**</h1>
 
 ## Scopul acestui proiect:
 După finalizarea cursului de SOFTWARE TESTER (Testare Manuală), am ales pentru partea practică a proiectului final să aplic cunoștințele SQL învățate la curs pentru a crea și manipula o bază de date dedicată gestionării activităților într-o clinică stomatologică.
 
-## I.Descrierea bazei de date:
+## Descrierea bazei de date:
 Baza de date „Clinică Stomatologică” gestionează informații legate de pacienți, medici stomatologi, programări, tratamente, facturi și plăți. 
 Baza de date are scopul de a centraliza și organiza eficient datele necesare pentru funcționarea clinicii, incluzând detalii despre pacienți, medicii care oferă servicii, tratamentele administrate și plățile efectuate.
 
-## II. Schema bazei de date
+## Schema bazei de date
+
+
 Baza de date este alcătuită din 7 tabele interconectate. Tabelele sunt legate prin chei primare și chei străine.
+* **Pacienți** (informații personale despre pacienți)
+* **Medici_Stomatologi** (detalii despre medici) 
+* **Programări** (informații privind programările pacienților)
+* **Tratamente** (tipuri de tratamente disponibile)
+* **Programare_Tratamente** (stochează legătura între programări și tratamente indicând tratamentele efectuate într-o anumită programare)
+* **Facturi** (facturi emise pentru tratamentele efectuate)
+* **Plăți** (înregistrează informațiile despre plățile efectuate de pacienți pentru facturile emise 
+
 Pentru a se vedea ușor relația dintre tabele și modul în care ele sunt legate am inclus în proiect și diagrama EER (am generat raportul de execuție din reverse engineering).
-Relațiile între tabele:
+![DesignDataBases] (https://github.com/Ema9106/Rotundu-Petrescu-Emanuela_04.10.2024_BD_MySQL/blob/main/RPEG_Proiect_final_EER_Diagram.png)
+* **Relațiile între tabele:**
+
 - Pacienți este conectată cu Programări printr-o relație 1-to-many, implementată prin Programări.ID_Pacient ca cheie externă.
 - Medici Stomatologi este conectată cu Programări printr-o relație 1-to-many, implementată prin Programări.ID_Dentist ca cheie externă.
 - Programări este conectată cu Facturi printr-o relație 1-to-many, implementată prin Facturi.ID_Programare ca cheie externă.
 - Facturi este conectată cu Plăți printr-o relație 1-to-many, implementată prin Plăți.ID_factură ca cheie externă.
 - Tratamente este conectată cu Programări prin tabelul intermediar Programare_Tratamente care gestionează relația many-to-many dintre ele.
 
-## III. Database Queries
-/* Crearea bazei de date și a tabelelor */
---- creare bază de date Clinică stomatologică
-create database Clinică_stomatologică;
+## Database Queries
 
+### DDL (Data Definition Language)
+Folosirea instrucțiunilor de tip DDL create database și create table. Ulterior creării tabelelor am intervenit asupra lor utilizând instrucțiunea de tip alter pentru a defini constrângerile de cheie străină.
+```sql
+--- creare bază de date
+               create database Clinică_stomatologică;
+```
+
+```sql
 --- crearea tabelelor în baza de date	
-CREATE TABLE Pacienți (
+1. CREATE TABLE Pacienți (
     ID_Pacient INT AUTO_INCREMENT PRIMARY KEY,
     Nume VARCHAR(30) NOT NULL,
     Prenume VARCHAR(30) NOT NULL,
@@ -31,7 +48,7 @@ CREATE TABLE Pacienți (
     Email VARCHAR(30),
     Telefon VARCHAR(15) NOT NULL
     );
-CREATE TABLE Medici_Stomatologi (
+2. CREATE TABLE Medici_Stomatologi (
     ID_Dentist INT AUTO_INCREMENT PRIMARY KEY,
     Nume VARCHAR(30) NOT NULL,
     Prenume VARCHAR(30) NOT NULL,
@@ -39,7 +56,7 @@ CREATE TABLE Medici_Stomatologi (
     Email VARCHAR(30),
     Telefon VARCHAR(15) NOT NULL
 );
-CREATE TABLE Programări (
+3. CREATE TABLE Programări (
     ID_Programare INT AUTO_INCREMENT PRIMARY KEY,
     ID_Pacient INT,
     ID_Dentist INT,
@@ -48,12 +65,12 @@ CREATE TABLE Programări (
     FOREIGN KEY (ID_Pacient) REFERENCES Pacienți(ID_Pacient),
     FOREIGN KEY (ID_Dentist) REFERENCES Medici_Stomatologi(ID_Dentist)
 );
-CREATE TABLE Tratamente (
+4. CREATE TABLE Tratamente (
     ID_Tratament INT AUTO_INCREMENT PRIMARY KEY,
     Nume_Tratament VARCHAR(300) NOT NULL,
     Cost DECIMAL(5, 2) NOT NULL
 );
-CREATE TABLE Facturi (
+5. CREATE TABLE Facturi (
     ID_factură INT AUTO_INCREMENT PRIMARY KEY,
     ID_Programare INT,
     Sumă_Totală DECIMAL(10, 2) NOT NULL,
@@ -61,7 +78,7 @@ CREATE TABLE Facturi (
     FOREIGN KEY (ID_Programare) REFERENCES Programări(ID_Programare)
 );
 
-CREATE TABLE Plăți (
+6. CREATE TABLE Plăți (
     ID_plată INT AUTO_INCREMENT PRIMARY KEY,
     ID_factură INT,
     Data_plății DATE NOT NULL,
@@ -69,14 +86,16 @@ CREATE TABLE Plăți (
     FOREIGN KEY (ID_factură) REFERENCES Facturi(ID_factură)
 );
 --- creare tabel „Programare_Tratamente” în baza de date pentru a gestiona tabelele „Programări” și „Tratamente”
-CREATE TABLE Programare_Tratamente (
+7. CREATE TABLE Programare_Tratamente (
     ID_Programare INT,
     ID_Tratament INT,
     PRIMARY KEY (ID_Programare, ID_Tratament),
     FOREIGN KEY (ID_Programare) REFERENCES Programări(ID_Programare),
     FOREIGN KEY (ID_Tratament) REFERENCES Tratamente(ID_Tratament)
 );
+```
 
+```sql
 /* Instrucțiuni ALTER pentru actualizarea structurii bazei de date */
 --- am definit o constrângere de cheie străină care asigură că coloana „ID_Pacient” din „Programări” va respecta referințele din tabelul „Pacienți”
 ALTER TABLE Programări
@@ -109,7 +128,11 @@ desc Tratamente;
 desc Programare_Tratamente;
 desc Facturi;
 desc Plăți;
+```
+### DML (Data Manipulation Language)
+A doilea pas al procesului este popularea bazei de date cu ajutorul instrucțiunilor de tipul  DML (insert, update, delete).
 
+```sql
 /* Inserarea datelor în tabele */
 --- Popularea cu date a tabelelor realizate
 --- inserare valori multiple  în tabela Pacienți
@@ -169,7 +192,11 @@ INSERT INTO Plăți (ID_factură, Data_plății, Suma_încasată) VALUES
 --- inserare valori în tabela Programare_Tratamente
 INSERT INTO Programare_Tratamente (ID_Programare, ID_Tratament) 
 VALUES (1, 8), (2, 8), (3, 8), (4, 8), (5, 8), (6, 8), (7, 8), (8, 9), (9, 8), (10, 9), (11, 10), (12, 14), (13, 12), (14, 11), (15, 13),(16, 9);
+```
 
+### DQL (Data Query Language)
+Al treilea pas al procesului și anume executarea instrucțiunilor de tip DQL  (select all, select anumite coloane, filtrare cu where, filtrări cu like, filtrări cu AND și OR, funcții agregate, filtrări pe funcții agregate, joinuri - inner join, left join, right join, order by ) folosite pentru interogarea datelor din baza de date  a Clinicii Stomatologice.
+```sql
 /* Vizualizarea înregistrărilor din tabele */
 --- vizualizarea tuturor înregistrărilor din tabele
 SELECT * FROM Pacienți;
@@ -283,22 +310,9 @@ FROM Plăți GROUP BY Data_plății;
 SELECT ID_Programare, SUM(Sumă_Totală) AS Total_Facturat
 FROM Facturi
 GROUP BY ID_Programare;
-
-
---- interogare pentru a găsi facturile care nu au corespondență în tabela plăți, în cazul în care o factură nu este plătită să o identificăm rapid
-SELECT f.ID_factură, f.ID_programare, f.Sumă_Totală, f.Data_facturii
-FROM Facturi f
-LEFT JOIN Plăți p ON f.ID_factură = p.ID_factură
-WHERE p.ID_factură IS NULL;
-
---- interogare suma totală încasată pentru un anumit Medic Stomatolog
-SELECT m.Nume, m.Prenume, SUM(p.Suma_încasată) AS Total_Incasat
-FROM Plăți p
-JOIN Facturi f ON p.ID_factură = f.ID_factură
-JOIN Programări pr ON f.ID_programare = pr.ID_Programare
-JOIN Medici_Stomatologi m ON pr.ID_Dentist = m.ID_Dentist
-WHERE m.Nume = 'Petrescu' AND m.Prenume = 'Ioan'
-GROUP BY m.Nume, m.Prenume;
+```
+#### --- JOIN
+```sql
 
 --- selectarea programărilor care includ un anume tratament, 
 --- această interogare selectează toate programările care includ un anume tratament specificat prin ID_Tratament
@@ -310,28 +324,22 @@ JOIN Tratamente t ON pt.ID_Tratament = t.ID_Tratament
 JOIN Programări p ON pt.ID_Programare = p.ID_Programare
 WHERE t.ID_Tratament = 9;
 
----  inner join între 3 tabele din baza de date: Pacienți, Programări și Medici stomatologi 
---- pentru a obține o listă cu pacienții programați ce medici le sunt alocați si data programării.
-      SELECT p.Nume AS Nume_Pacient, p.Prenume AS Prenume_Pacient, m.Nume AS Nume_Medic,
-    m.Prenume AS Prenume_Medic, pr.Data_programării AS Data_Programarii
+ --- am folosit joinuri pentru a combina informațiile din toate cele 7 tabele, pentru a afisa informațiile esentiale, având o imagine de asamblu. 
+--- Le-am ordonat după „ID_Pacient” și după data programării consultației.
+SELECT p.ID_Pacient, p.Nume AS Nume_Pacient, p.Prenume AS Prenume_Pacient, m.Nume AS Nume_Medic, m.Prenume AS Prenume_Medic,
+    pr.Data_programării, pr.Motivul, t.Nume_Tratament, t.Cost, f.Sumă_Totală, pl.Suma_încasată
 FROM Pacienți p
-INNER JOIN  Programări pr ON p.ID_Pacient = pr.ID_Pacient
-INNER JOIN Medici_Stomatologi m ON pr.ID_Dentist = m.ID_Dentist ORDER BY pr.Data_programării;
-    
-    
- --- left join cu 5 tabele Pacienți, Programări, Medicii Stomatologi, Programare Tratamente si Tratamente 
- --- vrem să vedem lista tuturor pacienților, medicii la care sunt programati, data programării, tratament si cost.
-SELECT p.ID_Pacient, p.Nume AS Nume_Pacient, p.Prenume AS Prenume_Pacient, m.Nume AS Nume_Medic, m.Prenume AS Prenume_Medic, 
-    pr.Data_programării AS Data_Programarii, t.Nume_Tratament AS Tratament, t.Cost AS Cost_Tratament
-FROM Pacienți p
-LEFT JOIN 
-    Programări pr ON p.ID_Pacient = pr.ID_Pacient
-LEFT JOIN 
-    Medici_Stomatologi m ON pr.ID_Dentist = m.ID_Dentist
-LEFT JOIN 
-    Programare_Tratamente pt ON pr.ID_Programare = pt.ID_Programare
-LEFT JOIN 
-    Tratamente t ON pt.ID_Tratament = t.ID_Tratament;
+JOIN Programări pr ON p.ID_Pacient = pr.ID_Pacient
+JOIN Medici_Stomatologi m ON pr.ID_Dentist = m.ID_Dentist
+JOIN Programare_Tratamente pt ON pr.ID_Programare = pt.ID_Programare
+JOIN Tratamente t ON pt.ID_Tratament = t.ID_Tratament
+JOIN Facturi f ON pr.ID_Programare = f.ID_Programare
+JOIN Plăți pl ON f.ID_factură = pl.ID_factură
+ORDER BY p.ID_Pacient, pr.Data_programării;
+```
+
+#### --- LEFT JOIN
+```sql
     
 --- left join cu 2 tabele, Tabelul Plăți si Facturi pentru a vedea toate plățile indiferent dacă au fost asociate sau nu unei facturi.
 --- dacă o factură nu are o plată corespunzătoare în tabela Plăți, câmpurile Data_Plății și Suma încasată vor fi NULL
@@ -359,35 +367,8 @@ LEFT JOIN
     Tratamente t ON pt.ID_Tratament = t.ID_Tratament
 ORDER BY 
     m.Specializarea, m.Nume, m.Prenume, t.Nume_Tratament;
-    
- 
- 
- --- am folosit joinuri pentru a combina informațiile din toate cele 7 tabele, pentru a afisa informațiile esentiale, având o imagine de asamblu. 
---- Le-am ordonat după „ID_Pacient” și după data programării consultației.
-SELECT p.ID_Pacient, p.Nume AS Nume_Pacient, p.Prenume AS Prenume_Pacient, m.Nume AS Nume_Medic, m.Prenume AS Prenume_Medic,
-    pr.Data_programării, pr.Motivul, t.Nume_Tratament, t.Cost, f.Sumă_Totală, pl.Suma_încasată
-FROM Pacienți p
-JOIN Programări pr ON p.ID_Pacient = pr.ID_Pacient
-JOIN Medici_Stomatologi m ON pr.ID_Dentist = m.ID_Dentist
-JOIN Programare_Tratamente pt ON pr.ID_Programare = pt.ID_Programare
-JOIN Tratamente t ON pt.ID_Tratament = t.ID_Tratament
-JOIN Facturi f ON pr.ID_Programare = f.ID_Programare
-JOIN Plăți pl ON f.ID_factură = pl.ID_factură
-ORDER BY p.ID_Pacient, pr.Data_programării;
-    
-    
----  am folosit un right join între tabela Medici_Stomatologi și tabela Programări
---- am grupat rezultatele după Id-ul pacientului
---- am sortat rezultatele in ordine descrescătoare după numărul de pacienți distincți.
-SELECT m.ID_Dentist,
-    CONCAT(m.Nume, ' ', m.Prenume) AS Nume_Complet_Medic,
-    COUNT(DISTINCT pr.ID_Pacient) AS Numar_Pacienti
-FROM Medici_Stomatologi m
-RIGHT JOIN Programări pr ON m.ID_Dentist = pr.ID_Dentist
-GROUP BY m.ID_Dentist
-ORDER BY Numar_Pacienti DESC;
-  
---- am făcut un LEFT JOIN între tabela Medici_Stomatologi și tabela Programări pe baza coloanei ID_Dentist. 
+	
+	--- am făcut un LEFT JOIN între tabela Medici_Stomatologi și tabela Programări pe baza coloanei ID_Dentist. 
 --- am grupat rezultatele pe baza ID_Dentist pentru a agrega programările fiecărui medic.
 --- am folosit clauza HAVING pentru a filtra doar acei medici care au avut cel puțin 3 programări.
 --- am sortat rezultatele descrescător după numărul de programări.
@@ -403,13 +384,71 @@ HAVING
     COUNT(pr.ID_Programare) >= 2
 ORDER BY 
     Numar_Programari DESC;
+```
 
+#### --- INNER JOIN
+```sql
+---  inner join între 3 tabele din baza de date: Pacienți, Programări și Medici stomatologi 
+--- pentru a obține o listă cu pacienții programați ce medici le sunt alocați si data programării.
+      SELECT p.Nume AS Nume_Pacient, p.Prenume AS Prenume_Pacient, m.Nume AS Nume_Medic,
+    m.Prenume AS Prenume_Medic, pr.Data_programării AS Data_Programarii
+FROM Pacienți p
+INNER JOIN  Programări pr ON p.ID_Pacient = pr.ID_Pacient
+INNER JOIN Medici_Stomatologi m ON pr.ID_Dentist = m.ID_Dentist ORDER BY pr.Data_programării;
+
+ ```   
+    
+#### --- RIGHT JOIN
+ ```sql    
+---  am folosit un right join între tabela Medici_Stomatologi și tabela Programări
+--- am grupat rezultatele după Id-ul pacientului
+--- am sortat rezultatele in ordine descrescătoare după numărul de pacienți distincți.
+SELECT m.ID_Dentist,
+    CONCAT(m.Nume, ' ', m.Prenume) AS Nume_Complet_Medic,
+    COUNT(DISTINCT pr.ID_Pacient) AS Numar_Pacienti
+FROM Medici_Stomatologi m
+RIGHT JOIN Programări pr ON m.ID_Dentist = pr.ID_Dentist
+GROUP BY m.ID_Dentist
+ORDER BY Numar_Pacienti DESC;
+   ```
+#### --- Subqueries 
+```sql
+--- interogare suma totală încasată pentru un anumit Medic Stomatolog
+--- subquery -  interogare în interiorul altei interogări, pentru a calcula suma totală încasată pentru un anume medic stomatolog.
+SELECT m.Nume, m.Prenume, SUM(p.Suma_încasată) AS Total_Incasat
+FROM Plăți p
+JOIN Facturi f ON p.ID_factură = f.ID_factură
+JOIN Programări pr ON f.ID_programare = pr.ID_Programare
+JOIN Medici_Stomatologi m ON pr.ID_Dentist = m.ID_Dentist
+WHERE m.Nume = 'Petrescu' AND m.Prenume = 'Ioan'
+GROUP BY m.Nume, m.Prenume;
+
+--- interogare pentru a găsi facturile care nu au corespondență în tabela plăți, în cazul în care o factură nu este plătită să o identificăm rapid.
+--- subquery -  interogare în interiorul altei interogări,pentru a găsi facturile care nu corespund în tabela de plăți.
+SELECT f.ID_factură, f.ID_programare, f.Sumă_Totală, f.Data_facturii
+FROM Facturi f
+LEFT JOIN Plăți p ON f.ID_factură = p.ID_factură
+WHERE p.ID_factură IS NULL;
+ --- left join cu 5 tabele Pacienți, Programări, Medicii Stomatologi, Programare Tratamente si Tratamente 
+ --- vrem să vedem lista tuturor pacienților, medicii la care sunt programati, data programării, tratament si cost.
+SELECT p.ID_Pacient, p.Nume AS Nume_Pacient, p.Prenume AS Prenume_Pacient, m.Nume AS Nume_Medic, m.Prenume AS Prenume_Medic, 
+    pr.Data_programării AS Data_Programarii, t.Nume_Tratament AS Tratament, t.Cost AS Cost_Tratament
+FROM Pacienți p
+LEFT JOIN 
+    Programări pr ON p.ID_Pacient = pr.ID_Pacient
+LEFT JOIN 
+    Medici_Stomatologi m ON pr.ID_Dentist = m.ID_Dentist
+LEFT JOIN 
+    Programare_Tratamente pt ON pr.ID_Programare = pt.ID_Programare
+LEFT JOIN 
+    Tratamente t ON pt.ID_Tratament = t.ID_Tratament;
+```
 
 ## IV. Concluzii
 
-Proiectul este realizat pentru a gestiona eficient informațiile esențiale ale unei clinici stomatologice. În cadrul acestui proiect, am parcurs toate instrucțiunile necesare pentru definirea și manipularea structurii bazei de date, utilizând instrucțiuni DDL (Data Definition Language), DML (Data Manipulation Language) și DQL (Data Query Language).
-Această bază de date este esențială pentru managementul eficient al unei clinici stomatologice, oferind funcționalități pentru:
-Gestionarea Pacienților: Păstrarea unei evidențe clare și organizate a pacienților, incluzând informațiile lor de contact și istoricul medical.
-Gestionarea Medicilor: Organizarea și urmărirea activității medicilor, inclusiv specializările acestora și programările aferente.
-Gestionarea Programărilor și Tratamente: Monitorizarea detaliată a programărilor pacienților, tratamentele efectuate, și resursele necesare pentru fiecare tratament.
-Facturare și Plăți: Generarea și urmărirea facturilor și plăților, asigurând o contabilitate precisă și transparență financiară.
+**Aplicarea SQL**: În cadrul acestui proiect, am parcurs instrucțiunile necesare pentru definirea și manipularea structurii bazei de date, utilizând instrucțiuni DDL (Data Definition Language), DML (Data Manipulation Language) și DQL (Data Query Language).
+*În concluzie* Această bază de date este gândită pentru managementul eficient al unei clinici stomatologice, oferind funcționalități pentru:
+1. Gestionarea Pacienților: Păstrarea unei evidențe clare și organizate a pacienților, incluzând informațiile lor de contact și istoricul medical.
+2. Gestionarea Medicilor: Organizarea și urmărirea activității medicilor, inclusiv specializările acestora și programările aferente.
+3. Gestionarea Programărilor și Tratamente: Monitorizarea detaliată a programărilor pacienților, tratamentele efectuate, și resursele necesare pentru fiecare tratament.
+4. Facturare și Plăți: Generarea și urmărirea facturilor și plăților, asigurând o contabilitate precisă și transparență financiară.
