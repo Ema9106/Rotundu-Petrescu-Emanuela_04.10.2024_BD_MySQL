@@ -24,7 +24,7 @@ Pentru a se vedea ușor relația dintre tabele și modul în care ele sunt legat
 ![DesignDataBases](https://github.com/Ema9106/Rotundu-Petrescu-Emanuela_04.10.2024_BD_MySQL/blob/main/RPEG_Proiect_final_EER_Diagram.png)
 
 
-* **Relațiile între tabele:**
+**Relațiile între tabele:**
 
 - Pacienți este conectată cu Programări printr-o relație 1-to-many, implementată prin Programări.ID_Pacient ca cheie externă.
 - Medici Stomatologi este conectată cu Programări printr-o relație 1-to-many, implementată prin Programări.ID_Dentist ca cheie externă.
