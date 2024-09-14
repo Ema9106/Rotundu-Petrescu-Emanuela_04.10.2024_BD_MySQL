@@ -20,7 +20,10 @@ Baza de date este alcătuită din 7 tabele interconectate. Tabelele sunt legate 
 * **Plăți** (înregistrează informațiile despre plățile efectuate de pacienți pentru facturile emise 
 
 Pentru a se vedea ușor relația dintre tabele și modul în care ele sunt legate am inclus în proiect și diagrama EER (am generat raportul de execuție din reverse engineering).
-![DesignDataBases] (https://github.com/Ema9106/Rotundu-Petrescu-Emanuela_04.10.2024_BD_MySQL/blob/main/RPEG_Proiect_final_EER_Diagram.png)
+
+![DesignDataBases](https://github.com/Ema9106/Rotundu-Petrescu-Emanuela_04.10.2024_BD_MySQL/blob/main/RPEG_Proiect_final_EER_Diagram.png)
+
+
 * **Relațiile între tabele:**
 
 - Pacienți este conectată cu Programări printr-o relație 1-to-many, implementată prin Programări.ID_Pacient ca cheie externă.
